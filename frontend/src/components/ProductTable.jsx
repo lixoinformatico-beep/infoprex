@@ -12,6 +12,7 @@ import { ArrowUpDown, Search } from "lucide-react";
 import { fmtEur, fmtNum, fmtDec } from "@/lib/format";
 
 const columns = [
+  { key: "cpr", label: "CNP", align: "left" },
   { key: "nome", label: "Produto", align: "left" },
   { key: "laboratorio", label: "Laboratório", align: "left" },
   { key: "qty", label: "Qtd (12m)", align: "right" },
@@ -82,58 +83,57 @@ export const ProductTable = ({ products, labs, lab, setLab }) => {
       </div>
 
       <div className="border border-border rounded-lg overflow-hidden">
-        <div className="max-h-[560px] overflow-auto">
-          <Table>
-            <TableHeader className="sticky top-0 bg-muted z-10">
-              <TableRow>
-                {columns.map((c) => (
-                  <TableHead
-                    key={c.key}
-                    onClick={() => toggleSort(c.key)}
-                    className={`cursor-pointer select-none text-xs font-semibold uppercase tracking-wider text-muted-foreground ${
-                      c.align === "right" ? "text-right" : "text-left"
-                    }`}
-                    data-testid={`sort-${c.key}`}
-                  >
-                    <span className={`inline-flex items-center gap-1 ${c.align === "right" ? "flex-row-reverse" : ""}`}>
-                      {c.label}
-                      <ArrowUpDown className="h-3 w-3 opacity-50" />
-                    </span>
-                  </TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((p, i) => (
-                <TableRow key={p.cpr + "-" + i} className="transition-colors duration-150 hover:bg-muted/50">
-                  <TableCell className="max-w-[280px] truncate" title={p.nome}>
-                    {p.nome}
-                  </TableCell>
-                  <TableCell>{p.laboratorio}</TableCell>
-                  <TableCell className="text-right tabular-nums">{fmtNum(p.qty)}</TableCell>
-                  <TableCell className="text-right tabular-nums">{fmtDec(p.pvp_txt)}</TableCell>
-                  <TableCell className="text-right tabular-nums">{fmtDec(p.pcu_txt)}</TableCell>
-                  <TableCell className="text-right tabular-nums">{fmtEur(p.rent_txt_total)}</TableCell>
-                  <TableCell className="text-right tabular-nums">{fmtEur(p.rent_xls_total)}</TableCell>
-                  <TableCell
-                    className={`text-right tabular-nums font-medium ${
-                      p.diff_total >= 0 ? "text-[#1A7B5E]" : "text-[#B23A3A]"
-                    }`}
-                  >
-                    {fmtEur(p.diff_total)}
-                  </TableCell>
-                </TableRow>
+        <Table containerClassName="max-h-[560px]">
+          <TableHeader className="sticky top-0 z-20">
+            <TableRow>
+              {columns.map((c) => (
+                <TableHead
+                  key={c.key}
+                  onClick={() => toggleSort(c.key)}
+                  className={`sticky top-0 bg-muted cursor-pointer select-none text-xs font-semibold uppercase tracking-wider text-muted-foreground ${
+                    c.align === "right" ? "text-right" : "text-left"
+                  }`}
+                  data-testid={`sort-${c.key}`}
+                >
+                  <span className={`inline-flex items-center gap-1 ${c.align === "right" ? "flex-row-reverse" : ""}`}>
+                    {c.label}
+                    <ArrowUpDown className="h-3 w-3 opacity-50" />
+                  </span>
+                </TableHead>
               ))}
-              {filtered.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className="text-center py-8 text-muted-foreground">
-                    Sem resultados.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filtered.map((p, i) => (
+              <TableRow key={p.cpr + "-" + i} className="transition-colors duration-150 hover:bg-muted/50">
+                <TableCell className="tabular-nums text-muted-foreground">{p.cpr}</TableCell>
+                <TableCell className="max-w-[280px] truncate" title={p.nome}>
+                  {p.nome}
+                </TableCell>
+                <TableCell>{p.laboratorio}</TableCell>
+                <TableCell className="text-right tabular-nums">{fmtNum(p.qty)}</TableCell>
+                <TableCell className="text-right tabular-nums">{fmtDec(p.pvp_txt)}</TableCell>
+                <TableCell className="text-right tabular-nums">{fmtDec(p.pcu_txt)}</TableCell>
+                <TableCell className="text-right tabular-nums">{fmtEur(p.rent_txt_total)}</TableCell>
+                <TableCell className="text-right tabular-nums">{fmtEur(p.rent_xls_total)}</TableCell>
+                <TableCell
+                  className={`text-right tabular-nums font-medium ${
+                    p.diff_total >= 0 ? "text-[#1A7B5E]" : "text-[#B23A3A]"
+                  }`}
+                >
+                  {fmtEur(p.diff_total)}
+                </TableCell>
+              </TableRow>
+            ))}
+            {filtered.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="text-center py-8 text-muted-foreground">
+                  Sem resultados.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
       <p className="text-xs text-muted-foreground mt-2">{filtered.length} produtos</p>
     </div>

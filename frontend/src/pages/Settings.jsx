@@ -92,30 +92,28 @@ export default function Settings() {
           <Card className="p-6 border border-border">
             <h2 className="text-2xl font-heading font-medium tracking-tight mb-4">Amostra de produtos</h2>
             <div className="border border-border rounded-lg overflow-hidden">
-              <div className="max-h-[480px] overflow-auto">
-                <Table>
-                  <TableHeader className="sticky top-0 bg-muted z-10">
-                    <TableRow>
-                      <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">CNP</TableHead>
-                      <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Descrição</TableHead>
-                      <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Laboratório</TableHead>
-                      <TableHead className="text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">PVP</TableHead>
-                      <TableHead className="text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">PCU</TableHead>
+              <Table containerClassName="max-h-[480px]">
+                <TableHeader className="sticky top-0 z-20">
+                  <TableRow>
+                    <TableHead className="sticky top-0 bg-muted text-xs font-semibold uppercase tracking-wider text-muted-foreground">CNP</TableHead>
+                    <TableHead className="sticky top-0 bg-muted text-xs font-semibold uppercase tracking-wider text-muted-foreground">Descrição</TableHead>
+                    <TableHead className="sticky top-0 bg-muted text-xs font-semibold uppercase tracking-wider text-muted-foreground">Laboratório</TableHead>
+                    <TableHead className="sticky top-0 bg-muted text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">PVP</TableHead>
+                    <TableHead className="sticky top-0 bg-muted text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">PCU</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {cardex.sample.map((p) => (
+                    <TableRow key={p.cnp} className="hover:bg-muted/50 transition-colors duration-150">
+                      <TableCell className="tabular-nums">{p.cnp}</TableCell>
+                      <TableCell className="max-w-[320px] truncate" title={p.descricao}>{p.descricao}</TableCell>
+                      <TableCell>{p.laboratorio}</TableCell>
+                      <TableCell className="text-right tabular-nums">{fmtDec(p.pvp)}</TableCell>
+                      <TableCell className="text-right tabular-nums">{fmtDec(p.pcu)}</TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {cardex.sample.map((p) => (
-                      <TableRow key={p.cnp} className="hover:bg-muted/50 transition-colors duration-150">
-                        <TableCell className="tabular-nums">{p.cnp}</TableCell>
-                        <TableCell className="max-w-[320px] truncate" title={p.descricao}>{p.descricao}</TableCell>
-                        <TableCell>{p.laboratorio}</TableCell>
-                        <TableCell className="text-right tabular-nums">{fmtDec(p.pvp)}</TableCell>
-                        <TableCell className="text-right tabular-nums">{fmtDec(p.pcu)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
             <p className="text-xs text-muted-foreground mt-2">A mostrar os primeiros {cardex.sample.length} de {fmtNum(cardex.count)} produtos.</p>
           </Card>
