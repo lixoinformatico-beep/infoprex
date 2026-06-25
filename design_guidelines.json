@@ -1,0 +1,111 @@
+{
+  "theme": "light",
+  "archetype": "Archetype 1: Organic & Earthy (Pharmacy & Finance Trust)",
+  "language": "pt-PT",
+  "currency": "EUR",
+  "typography": {
+    "heading_font": "Outfit",
+    "body_font": "IBM Plex Sans",
+    "scales": {
+      "h1": "text-4xl tracking-tight font-semibold text-foreground",
+      "h2": "text-2xl tracking-tight font-medium text-foreground",
+      "h3": "text-xl font-medium text-foreground",
+      "body": "text-sm text-foreground",
+      "small": "text-xs text-muted-foreground",
+      "kpi_value": "text-4xl font-semibold tracking-tight text-foreground",
+      "table_header": "text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+    },
+    "font_imports": [
+      "@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Outfit:wght@400;500;600;700&display=swap');"
+    ]
+  },
+  "colors": {
+    "light": {
+      "background": "120 10% 97%",
+      "foreground": "140 17% 8%",
+      "card": "0 0% 100%",
+      "card-foreground": "140 17% 8%",
+      "popover": "0 0% 100%",
+      "popover-foreground": "140 17% 8%",
+      "primary": "164 56% 20%",
+      "primary-foreground": "0 0% 100%",
+      "secondary": "153 23% 90%",
+      "secondary-foreground": "164 56% 20%",
+      "muted": "140 8% 92%",
+      "muted-foreground": "147 7% 37%",
+      "accent": "138 18% 86%",
+      "accent-foreground": "140 17% 8%",
+      "destructive": "0 48% 45%",
+      "destructive-foreground": "0 0% 100%",
+      "border": "145 8% 83%",
+      "input": "145 8% 83%",
+      "ring": "164 56% 20%",
+      "chart-1": "164 56% 20%",
+      "chart-2": "153 45% 45%",
+      "chart-3": "0 48% 45%",
+      "chart-4": "43 74% 56%",
+      "chart-5": "140 17% 8%"
+    },
+    "custom_status": {
+      "gain_text": "text-[#1A7B5E]",
+      "gain_bg": "bg-[#E2F1EC]",
+      "loss_text": "text-[#B23A3A]",
+      "loss_bg": "bg-[#F7E6E6]"
+    }
+  },
+  "spacing_and_layout": {
+    "general": "Generous spacing. Use p-6 or p-8 for cards to let financial data breathe.",
+    "dashboard_grid": "Control Room Grid. grid-cols-1 md:grid-cols-3 lg:grid-cols-4 with gap-6. KPI cards take 1 col, Tables take full width or 3 cols.",
+    "page_padding": "py-8 px-4 md:px-8 max-w-[1400px] mx-auto",
+    "radius": "0.5rem"
+  },
+  "components": {
+    "cards": {
+      "style": "Flat background, 1px solid border-border, no shadow. Hover: slight shadow-sm.",
+      "kpi": "Include title, main value (€), and a subtitle with percentage change or context."
+    },
+    "tables": {
+      "style": "Dense tabular layout. Use IBM Plex Sans for numbers (tabular lining). Right-align numeric columns.",
+      "headers": "Sticky headers for scrolling. Background muted.",
+      "rows": "Hover state: bg-muted/50. Use color selectively for Gain/Loss columns only."
+    },
+    "file_upload": {
+      "style": "Large dropzone area. border-2 border-dashed border-primary/30 rounded-xl p-12 bg-primary/5 hover:bg-primary/10 transition-colors cursor-pointer text-center.",
+      "icon": "Lucide UploadCloud, size 48, text-primary mb-4"
+    },
+    "buttons": {
+      "primary": "bg-primary text-primary-foreground hover:bg-primary/90 font-medium rounded-md",
+      "outline": "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground font-medium rounded-md"
+    }
+  },
+  "icons": {
+    "library": "lucide-react",
+    "instructions": "Use lucide-react for all interface icons. Use clear, simple metaphors (e.g., Upload, Settings, BarChart3, TrendingUp, TrendingDown)."
+  },
+  "images": [
+    {
+      "category": "background",
+      "url": "https://images.unsplash.com/photo-1763228914956-64344d57894b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTV8MHwxfHNlYXJjaHwxfHxwaGFybWFjeSUyMGxhYm9yYXRvcnklMjBhYnN0cmFjdCUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzgyMzgwMzI1fDA&ixlib=rb-4.1.0&q=85",
+      "description": "Medical supplies on blue - Use as a subtle decorative header background or empty state illustration with low opacity (10%)."
+    }
+  ],
+  "testing": {
+    "attributes": "All interactive elements (buttons, inputs, table headers, file droppers) MUST include a 'data-testid' attribute (e.g., data-testid='upload-txt-button', data-testid='kpi-total-gain')."
+  },
+  "motion": {
+    "hover": "transition-colors duration-200 ease-in-out",
+    "table_rows": "transition-colors duration-150"
+  },
+  "instructions_to_main_agent": [
+    "Use Tailwind CSS and Shadcn UI components.",
+    "Implement the theme variables in index.css exactly as provided.",
+    "Ensure IBM Plex Sans is applied to body text, especially inside tables for tabular lining of numbers.",
+    "Build a primary 'Dashboard' page that allows TXT file upload and displays KPIs + Charts.",
+    "Build a 'Settings' page for the Cardex XLS file upload.",
+    "Implement data-testid attributes on all key interactive elements.",
+    "Use Recharts for the laboratory profitability distribution (Bar chart or Pie/Donut).",
+    "For the data table, include specific visual styling for positive (green) and negative (red) profitability margins to make analysis fast.",
+    "Do NOT use transparent headers. Ensure navigation clearly separates the Dashboard and Settings sections.",
+    "Align numeric values in tables to the right."
+  ]
+}
