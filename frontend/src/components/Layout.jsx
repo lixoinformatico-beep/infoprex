@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { BarChart3, Settings, Pill } from "lucide-react";
+import { BarChart3, Settings } from "lucide-react";
 
 export const Layout = ({ children }) => {
   const linkClass = ({ isActive }) =>
@@ -12,11 +12,13 @@ export const Layout = ({ children }) => {
       <header className="border-b border-border bg-card sticky top-0 z-30">
         <div className="max-w-[1400px] mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center">
-              <Pill className="h-5 w-5 text-primary-foreground" />
-            </div>
+            <img
+              src="/premiumfarma-logo.png"
+              alt="Premium Farma"
+              className="h-9 w-9 rounded-lg object-contain"
+            />
             <div className="leading-tight">
-              <p className="font-heading font-semibold text-foreground">Rentab. Farmácia</p>
+              <p className="font-heading font-semibold text-foreground">Análise Infoprex - Farmácia Nova</p>
               <p className="text-xs text-muted-foreground">Análise por Laboratório</p>
             </div>
           </div>

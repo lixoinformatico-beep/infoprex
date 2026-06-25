@@ -181,12 +181,13 @@ def analyse_txt(content: bytes, cardex_products: dict) -> dict:
 
         pvp_x = cx.get('pvp')
         pcu_x = cx.get('pcu')
-        if pvp_x is None or pcu_x is None:
+        if pcu_x is None:
             continue
-        ivr_x = iva_rate(cx.get('iva')) if cx.get('iva') is not None else ivr_t
 
+        # Rentabilidade Real: PVP do TXT (sem IVA) menos o PCU do TXT
         rent_txt_unit = pvp_t / (1 + ivr_t) - pcu_t
-        rent_xls_unit = pvp_x / (1 + ivr_x) - pcu_x
+        # Rentabilidade Cardex: mesmo PVP real do TXT (sem IVA) menos o PCU do Cardex
+        rent_xls_unit = pvp_t / (1 + ivr_t) - pcu_x
 
         rent_txt_total = rent_txt_unit * qty
         rent_xls_total = rent_xls_unit * qty
