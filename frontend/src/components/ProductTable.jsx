@@ -22,9 +22,8 @@ const columns = [
   { key: "diff_total", label: "Diferença", align: "right", money: true, tone: true },
 ];
 
-export const ProductTable = ({ products, labs }) => {
+export const ProductTable = ({ products, labs, lab, setLab }) => {
   const [search, setSearch] = useState("");
-  const [lab, setLab] = useState("all");
   const [sortKey, setSortKey] = useState("rent_txt_total");
   const [sortDir, setSortDir] = useState("desc");
 

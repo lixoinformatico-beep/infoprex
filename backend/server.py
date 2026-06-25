@@ -1,6 +1,7 @@
 from fastapi import FastAPI, APIRouter, UploadFile, File, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import io
@@ -189,8 +190,9 @@ def analyse_txt(content: bytes, cardex_products: dict) -> dict:
 
         rent_txt_total = rent_txt_unit * qty
         rent_xls_total = rent_xls_unit * qty
-        diff_unit = rent_txt_unit - rent_xls_unit
-        diff_total = rent_txt_total - rent_xls_total
+        # Diferença positiva => o Cardex é mais rentável (a farmácia ganha mais connosco)
+        diff_unit = rent_xls_unit - rent_txt_unit
+        diff_total = rent_xls_total - rent_txt_total
 
         lab = cx.get('laboratorio') or 'Sem Laboratório'
         nome = row[idx['NOM']].strip() if 'NOM' in idx and idx['NOM'] < len(row) else cx.get('descricao')
@@ -306,6 +308,70 @@ async def delete_analysis(analysis_id: str):
     if res.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Análise não encontrada.")
     return {'deleted': True}
+
+
+@api_router.get("/analysis/{analysis_id}/export")
+async def export_analysis(analysis_id: str):
+    doc = await db.analyses.find_one({'id': analysis_id}, {'_id': 0})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Análise não encontrada.")
+
+    from openpyxl.styles import Font, PatternFill, Alignment
+
+    wb = openpyxl.Workbook()
+    header_fill = PatternFill("solid", fgColor="1A5C46")
+    header_font = Font(bold=True, color="FFFFFF")
+
+    def style_header(ws, ncols):
+        for c in range(1, ncols + 1):
+            cell = ws.cell(row=1, column=c)
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = Alignment(horizontal="center")
+
+    s = doc['summary']
+    ws1 = wb.active
+    ws1.title = "Resumo"
+    ws1.append(["Indicador", "Valor"])
+    ws1.append(["Ficheiro de vendas", doc.get('filename')])
+    ws1.append(["Cardex", doc.get('cardex_filename')])
+    ws1.append(["Rentabilidade Real (Vendas) €", s['total_rent_txt']])
+    ws1.append(["Rentabilidade Cardex (Referência) €", s['total_rent_xls']])
+    ws1.append(["Diferença (Cardex - Real) €", s['total_diff']])
+    ws1.append(["Quantidade total (12m)", s['total_qty']])
+    ws1.append(["Nº de produtos", s['n_products']])
+    ws1.append(["Nº de laboratórios", s['n_labs']])
+    style_header(ws1, 2)
+    ws1.column_dimensions['A'].width = 36
+    ws1.column_dimensions['B'].width = 30
+
+    ws2 = wb.create_sheet("Laboratórios")
+    ws2.append(["Laboratório", "Produtos", "Qtd (12m)", "Rent. Real €", "Rent. Cardex €", "Diferença €"])
+    for l in doc['labs']:
+        ws2.append([l['laboratorio'], l['n_products'], l['qty'], l['rent_txt_total'], l['rent_xls_total'], l['diff_total']])
+    style_header(ws2, 6)
+    for col, w in zip("ABCDEF", [28, 12, 12, 16, 16, 14]):
+        ws2.column_dimensions[col].width = w
+
+    ws3 = wb.create_sheet("Produtos")
+    ws3.append(["Código", "Produto", "Laboratório", "Qtd (12m)", "PVP", "PCU",
+                "PVP Cardex", "PCU Cardex", "Rent. Real €", "Rent. Cardex €", "Diferença €"])
+    for p in sorted(doc['products'], key=lambda x: (x['laboratorio'], -x['rent_txt_total'])):
+        ws3.append([p['cpr'], p['nome'], p['laboratorio'], p['qty'], p['pvp_txt'], p['pcu_txt'],
+                    p['pvp_xls'], p['pcu_xls'], p['rent_txt_total'], p['rent_xls_total'], p['diff_total']])
+    style_header(ws3, 11)
+    for col, w in zip("ABCDEFGHIJK", [12, 42, 22, 10, 10, 10, 11, 11, 14, 15, 13]):
+        ws3.column_dimensions[col].width = w
+
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+    fname = "rentabilidade_laboratorios.xlsx"
+    return StreamingResponse(
+        buf,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f'attachment; filename="{fname}"'},
+    )
 
 
 @api_router.get("/")

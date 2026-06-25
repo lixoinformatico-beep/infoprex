@@ -1,20 +1,27 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { AlertCircle, TrendingUp, TrendingDown, Boxes, FlaskConical, Wallet } from "lucide-react";
+import { AlertCircle, TrendingUp, TrendingDown, Boxes, FlaskConical, Wallet, FileSpreadsheet, ChevronRight } from "lucide-react";
 import { FileDropzone } from "@/components/FileDropzone";
 import { KpiCard } from "@/components/KpiCard";
 import { LabChart } from "@/components/LabChart";
 import { ProductTable } from "@/components/ProductTable";
-import { getCardex, getLatestAnalysis, uploadAnalysis } from "@/lib/api";
+import { getCardex, getLatestAnalysis, uploadAnalysis, API } from "@/lib/api";
 import { fmtEur, fmtNum, fmtDate } from "@/lib/format";
 
 export default function Dashboard() {
   const [cardex, setCardex] = useState(null);
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [labFilter, setLabFilter] = useState("all");
+  const productRef = useRef(null);
+
+  const selectLab = (l) => {
+    setLabFilter(l);
+    setTimeout(() => productRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+  };
 
   useEffect(() => {
     getCardex().then(setCardex).catch(() => setCardex({ exists: false }));
@@ -98,9 +105,9 @@ export default function Dashboard() {
             />
             <KpiCard
               testid="kpi-diff"
-              title="Diferença"
+              title="Diferença (Cardex − Real)"
               value={fmtEur(s.total_diff)}
-              subtitle={s.total_diff >= 0 ? "Acima do Cardex" : "Abaixo do Cardex"}
+              subtitle={s.total_diff >= 0 ? "A farmácia ganha mais com o Cardex" : "Vendas acima do Cardex"}
               icon={s.total_diff >= 0 ? TrendingUp : TrendingDown}
               tone={s.total_diff >= 0 ? "gain" : "loss"}
             />
@@ -114,7 +121,19 @@ export default function Dashboard() {
           </Card>
 
           <Card className="p-6 border border-border">
-            <h2 className="text-2xl font-heading font-medium tracking-tight mb-4">Resumo por Laboratório</h2>
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+              <div>
+                <h2 className="text-2xl font-heading font-medium tracking-tight">Resumo por Laboratório</h2>
+                <p className="text-sm text-muted-foreground mt-1">Clique num laboratório para ver os produtos individuais.</p>
+              </div>
+              <a
+                href={`${API}/analysis/${analysis.id}/export`}
+                data-testid="export-excel-btn"
+                className="inline-flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 font-medium rounded-md px-4 py-2 text-sm transition-colors duration-200"
+              >
+                <FileSpreadsheet className="h-4 w-4" /> Exportar Excel
+              </a>
+            </div>
             <div className="border border-border rounded-lg overflow-hidden">
               <Table>
                 <TableHeader className="bg-muted">
@@ -129,8 +148,18 @@ export default function Dashboard() {
                 </TableHeader>
                 <TableBody>
                   {analysis.labs.map((l) => (
-                    <TableRow key={l.laboratorio} className="hover:bg-muted/50 transition-colors duration-150" data-testid={`lab-row-${l.laboratorio}`}>
-                      <TableCell className="font-medium">{l.laboratorio}</TableCell>
+                    <TableRow
+                      key={l.laboratorio}
+                      onClick={() => selectLab(l.laboratorio)}
+                      className="hover:bg-muted/50 transition-colors duration-150 cursor-pointer"
+                      data-testid={`lab-row-${l.laboratorio}`}
+                    >
+                      <TableCell className="font-medium">
+                        <span className="inline-flex items-center gap-1">
+                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                          {l.laboratorio}
+                        </span>
+                      </TableCell>
                       <TableCell className="text-right tabular-nums">{fmtNum(l.n_products)}</TableCell>
                       <TableCell className="text-right tabular-nums">{fmtNum(l.qty)}</TableCell>
                       <TableCell className="text-right tabular-nums">{fmtEur(l.rent_txt_total)}</TableCell>
@@ -145,12 +174,14 @@ export default function Dashboard() {
             </div>
           </Card>
 
-          <Card className="p-6 border border-border">
+          <Card ref={productRef} className="p-6 border border-border scroll-mt-20">
             <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-              <h2 className="text-2xl font-heading font-medium tracking-tight">Detalhe por Produto</h2>
+              <h2 className="text-2xl font-heading font-medium tracking-tight">
+                Detalhe por Produto{labFilter !== "all" ? ` — ${labFilter}` : ""}
+              </h2>
               <p className="text-xs text-muted-foreground">Análise de {fmtDate(analysis.created_at)} · {analysis.filename}</p>
             </div>
-            <ProductTable products={analysis.products} labs={analysis.labs} />
+            <ProductTable products={analysis.products} labs={analysis.labs} lab={labFilter} setLab={setLabFilter} />
           </Card>
         </>
       )}
