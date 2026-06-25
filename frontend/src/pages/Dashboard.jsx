@@ -8,7 +8,7 @@ import { FileDropzone } from "@/components/FileDropzone";
 import { KpiCard } from "@/components/KpiCard";
 import { LabChart } from "@/components/LabChart";
 import { ProductTable } from "@/components/ProductTable";
-import { getCardex, getLatestAnalysis, uploadAnalysis, API } from "@/lib/api";
+import { getCardex, uploadAnalysis, API } from "@/lib/api";
 import { fmtEur, fmtNum, fmtDate } from "@/lib/format";
 
 export default function Dashboard() {
@@ -24,10 +24,9 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
+    // Só verifica se o Cardex existe; o dashboard arranca vazio,
+    // a análise só aparece depois de carregar um ficheiro de vendas.
     getCardex().then(setCardex).catch(() => setCardex({ exists: false }));
-    getLatestAnalysis()
-      .then((d) => d.exists && setAnalysis(d))
-      .catch(() => {});
   }, []);
 
   const handleUpload = async (file) => {
