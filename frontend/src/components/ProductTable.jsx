@@ -124,10 +124,17 @@ export const ProductTable = ({ products, labs, lab, setLab }) => {
                 >
                   {fmtEur(p.diff_total)}
                 </TableCell>
-                <TableCell>
+                <TableCell className="whitespace-nowrap">
                   {p.melhor_desconto ? (
-                    <span className="inline-block rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-foreground whitespace-nowrap">
-                      {p.melhor_desconto}
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="inline-block rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-foreground">
+                        {p.melhor_desconto}
+                      </span>
+                      {p.melhor_desconto_pct != null && (
+                        <span className="text-xs font-semibold tabular-nums text-foreground">
+                          {Math.round(p.melhor_desconto_pct * 1000) / 10}%
+                        </span>
+                      )}
                     </span>
                   ) : (
                     <span className="text-muted-foreground">—</span>
