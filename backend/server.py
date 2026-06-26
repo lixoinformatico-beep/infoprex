@@ -59,6 +59,32 @@ def round2(x: Optional[float]) -> Optional[float]:
 
 
 # ----------------------------- Cardex (XLS) -----------------------------
+# Cada tipo de desconto vem num par de colunas: (valor do desconto, margem).
+# (nome, índice do valor, índice da margem)
+DESCONTO_TIPOS = [
+    ('Acordo Tripartido', 6, 7),
+    ('TFO', 8, 9),
+    ('Simplex', 10, 11),
+    ('Bolsa', 12, 13),
+    ('Delegado', 14, 15),
+]
+
+
+def melhor_desconto(r):
+    """Devolve o nome do tipo de desconto com a maior margem entre os
+    tipos disponíveis (valor de desconto não nulo)."""
+    melhor_nome, melhor_margem = None, None
+    for nome, vi, mi in DESCONTO_TIPOS:
+        if vi >= len(r) or r[vi] is None:   # tipo não disponível para este produto
+            continue
+        m = parse_num(r[mi]) if mi < len(r) else None
+        if m is None:
+            continue
+        if melhor_margem is None or m > melhor_margem:
+            melhor_margem, melhor_nome = m, nome
+    return melhor_nome
+
+
 def parse_cardex_xlsx(content: bytes) -> dict:
     wb = openpyxl.load_workbook(io.BytesIO(content), read_only=True, data_only=True)
     ws = wb.worksheets[0]
@@ -81,11 +107,17 @@ def parse_cardex_xlsx(content: bytes) -> dict:
             'iva': parse_num(r[4]),
             'laboratorio': lab,
             'acordo_tripartido': parse_num(r[6]),
+            'margem_at': parse_num(r[7]),
             'tfo': parse_num(r[8]),
+            'margem_tfo': parse_num(r[9]),
             'simplex': parse_num(r[10]),
+            'margem_simplex': parse_num(r[11]),
             'bolsa': parse_num(r[12]),
+            'margem_bolsa': parse_num(r[13]),
             'delegado': parse_num(r[14]),
+            'margem_delegado': parse_num(r[15]),
             'rentb_maxima': parse_num(r[16]),
+            'melhor_desconto': melhor_desconto(r),
             'pcu': parse_num(r[17]),
         }
     wb.close()
@@ -214,6 +246,8 @@ def analyse_txt(content: bytes, cardex_products: dict) -> dict:
             'rent_xls_total': round2(rent_xls_total),
             'diff_unit': round(diff_unit, 4),
             'diff_total': round2(diff_total),
+            'melhor_desconto': cx.get('melhor_desconto'),
+            'rentb_maxima': round2(cx.get('rentb_maxima')) if cx.get('rentb_maxima') is not None else None,
         })
 
         if lab not in labs_agg:
@@ -356,12 +390,14 @@ async def export_analysis(analysis_id: str):
 
     ws3 = wb.create_sheet("Produtos")
     ws3.append(["Código", "Produto", "Laboratório", "Qtd (12m)", "PVP", "PCU",
-                "PVP Cardex", "PCU Cardex", "Rent. Real €", "Rent. Cardex €", "Diferença €"])
+                "PVP Cardex", "PCU Cardex", "Rent. Real €", "Rent. Cardex €", "Diferença €",
+                "Melhor Desconto"])
     for p in sorted(doc['products'], key=lambda x: (x['laboratorio'], -x['rent_txt_total'])):
         ws3.append([p['cpr'], p['nome'], p['laboratorio'], p['qty'], p['pvp_txt'], p['pcu_txt'],
-                    p['pvp_xls'], p['pcu_xls'], p['rent_txt_total'], p['rent_xls_total'], p['diff_total']])
-    style_header(ws3, 11)
-    for col, w in zip("ABCDEFGHIJK", [12, 42, 22, 10, 10, 10, 11, 11, 14, 15, 13]):
+                    p['pvp_xls'], p['pcu_xls'], p['rent_txt_total'], p['rent_xls_total'], p['diff_total'],
+                    p.get('melhor_desconto') or '—'])
+    style_header(ws3, 12)
+    for col, w in zip("ABCDEFGHIJKL", [12, 42, 22, 10, 10, 10, 11, 11, 14, 15, 13, 18]):
         ws3.column_dimensions[col].width = w
 
     buf = io.BytesIO()

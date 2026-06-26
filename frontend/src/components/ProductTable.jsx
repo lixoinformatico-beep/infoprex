@@ -21,6 +21,7 @@ const columns = [
   { key: "rent_txt_total", label: "Rent. Real", align: "right", money: true },
   { key: "rent_xls_total", label: "Rent. Cardex", align: "right", money: true },
   { key: "diff_total", label: "Diferença", align: "right", money: true, tone: true },
+  { key: "melhor_desconto", label: "Melhor Desconto", align: "left" },
 ];
 
 export const ProductTable = ({ products, labs, lab, setLab }) => {
@@ -122,6 +123,15 @@ export const ProductTable = ({ products, labs, lab, setLab }) => {
                   }`}
                 >
                   {fmtEur(p.diff_total)}
+                </TableCell>
+                <TableCell>
+                  {p.melhor_desconto ? (
+                    <span className="inline-block rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-foreground whitespace-nowrap">
+                      {p.melhor_desconto}
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
