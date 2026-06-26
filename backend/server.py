@@ -377,7 +377,11 @@ async def export_analysis(analysis_id: str):
 
 @api_router.get("/")
 async def root():
-    return {"message": "Pharma Rentabilidade API"}
+    return {
+        "message": "Pharma Rentabilidade API",
+        "version": "2.0",
+        "rent_cardex": "PVP_TXT_sem_IVA - PCU_Cardex",
+    }
 
 
 app.include_router(api_router)
