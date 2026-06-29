@@ -189,9 +189,15 @@ def analyse_txt(content: bytes, cardex_products: dict) -> dict:
 
     products = []
     labs_agg = {}
+    farmacia = None
     for row in reader:
         if len(row) <= idx['CPR']:
             continue
+        # Nome da farmácia: coluna D (4º campo, índice 3) do TXT de vendas
+        if farmacia is None and len(row) > 3:
+            val = str(row[3]).strip()
+            if val:
+                farmacia = val
         cpr = str(row[idx['CPR']]).strip()
         cx = cardex_products.get(cpr)
         if cx is None:
@@ -283,7 +289,7 @@ def analyse_txt(content: bytes, cardex_products: dict) -> dict:
         'n_products': len(products),
         'n_labs': len(labs),
     }
-    return {'summary': summary, 'labs': labs, 'products': products}
+    return {'summary': summary, 'labs': labs, 'products': products, 'farmacia': farmacia}
 
 
 @api_router.post("/analysis/upload")

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { AlertCircle, TrendingUp, TrendingDown, Boxes, FlaskConical, Wallet, FileSpreadsheet, ChevronRight } from "lucide-react";
+import { AlertCircle, TrendingUp, TrendingDown, Boxes, FlaskConical, Wallet, FileSpreadsheet, ChevronRight, Store } from "lucide-react";
 import { FileDropzone } from "@/components/FileDropzone";
 import { KpiCard } from "@/components/KpiCard";
 import { LabChart } from "@/components/LabChart";
@@ -53,6 +53,12 @@ export default function Dashboard() {
         <p className="text-muted-foreground mt-1">
           Carregue o ficheiro de vendas (.txt) para calcular o ganho/perda da farmácia.
         </p>
+        {analysis?.farmacia && (
+          <div className="mt-3 inline-flex items-center gap-2 rounded-lg bg-primary/10 border border-primary/20 px-3 py-1.5">
+            <Store className="h-4 w-4 text-primary" />
+            <span className="text-sm font-medium text-foreground">Farmácia: <strong>{analysis.farmacia}</strong></span>
+          </div>
+        )}
       </div>
 
       {cardex && !cardex.exists && (
@@ -178,7 +184,7 @@ export default function Dashboard() {
               <h2 className="text-2xl font-heading font-medium tracking-tight">
                 Detalhe por Produto{labFilter !== "all" ? ` — ${labFilter}` : ""}
               </h2>
-              <p className="text-xs text-muted-foreground">Análise de {fmtDate(analysis.created_at)} · {analysis.filename}</p>
+              <p className="text-xs text-muted-foreground">{analysis.farmacia ? `${analysis.farmacia} · ` : ""}Análise de {fmtDate(analysis.created_at)} · {analysis.filename}</p>
             </div>
             <ProductTable products={analysis.products} labs={analysis.labs} lab={labFilter} setLab={setLabFilter} />
           </Card>
